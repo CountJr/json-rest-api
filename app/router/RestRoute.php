@@ -13,38 +13,41 @@ use Nette\InvalidArgumentException;
 class RestRoute implements IRouter
 {
     private static $methodsMap = [
-        'GET' => 'List',
-        'POST' => 'Create',
-        'PUT' => 'Modify',
-        'DELETE' => 'Delete',
+        'GET' => 'list',
+        'POST' => 'create',
+        'PUT' => 'modify',
+        'DELETE' => 'delete',
     ];
     private $route;
 
-    public function __construct($method, $mask, $presenter) {
-        if(array_key_exists($method, self::$methodsMap)) {
-            $methodsMap = self::$methodsMap[$method];
-            $apiMeta = [
-                'presenter' => $presenter,
-                'action' => "action{$methodsMap}",
-            ];
-            $this->route = new Route($mask, $apiMeta);
-        } else {
-            throw new InvalidArgumentException("Method '{$method}' is not allowed.");
-        }
+    public function __construct($mask, $presenter) {
+        $this->route = new Route($mask, ['presenter' => $presenter]);
+        var_dump($this->route);
     }
 
     /**
      * Maps HTTP request to a Request object.
+     * @param HttpRequest $httpRequest
      * @return AppRequest|NULL
      */
     function match(HttpRequest $httpRequest) {
 
-        return $this->route->match($httpRequest);
+        $match = $this->route->match($httpRequest);
+
+        if(array_key_exists($match->getMethod(), self::$methodsMap)) {
+            $match->setParameters(array_merge($match->getParameters(), ['action' => self::$methodsMap[$match->getMethod()]]));
+            var_dump($match);
+            return $match;
+        } else {
+            throw new InvalidArgumentException("Method '{$match->getMethod()}' is not allowed.");
+        }
 
     }
 
     /**
      * Constructs absolute URL from Request object.
+     * @param AppRequest $appRequest
+     * @param Url $refUrl
      * @return string|NULL
      */
     function constructUrl(AppRequest $appRequest, Url $refUrl) {
