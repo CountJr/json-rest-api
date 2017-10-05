@@ -57,9 +57,12 @@ class UsersPresenter extends Nette\Application\UI\Presenter
     }
 
     public function actionDelete($id) {
-        if(!$id) {
+        $user = $this->database->table('users')->get($id);
+        if(!$id || !$user) {
             throw new InvalidArgumentException('Invalid Id');
         }
+        $user->delete();
+        $this->sendResponse(new JsonResponse(['msg' => 'ok']));
     }
 
     private function fetchRowToArray($row) {
