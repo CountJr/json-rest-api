@@ -17,7 +17,7 @@ class UsersPresenter extends Nette\Application\UI\Presenter
 
     public function actionList($id) {
         if(!$id) {
-            $users = array_map(function($item) { return $this->fetchRowToArray($item);},
+            $users = array_map(function($user) { return $this->fetchRowToArray($user);},
                 iterator_to_array($this->database->table('users')));
             $this->sendResponse(new JsonResponse($users));
         } else {
@@ -27,7 +27,16 @@ class UsersPresenter extends Nette\Application\UI\Presenter
     }
 
     public function actionCreate() {
-        var_dump($this->request->getParameters());
+        $newUser = json_decode($this->getHttpRequest()->getRawBody());
+        $newUserId = $this->database->table('users')->insert([
+            'email' => $newUser->email,
+            'password' => $newUser->password,
+            'first_name' => $newUser->first_name,
+            'second_name' => $newUser->second_name,
+            'age' => $newUser->age,
+            'sex' => $newUser->sex,
+        ])->getPrimary();
+        $this->sendResponse(new JsonResponse(['id' => $newUserId]));
     }
 
     public function actionEdit($id) {
