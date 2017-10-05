@@ -39,10 +39,21 @@ class UsersPresenter extends Nette\Application\UI\Presenter
         $this->sendResponse(new JsonResponse(['id' => $newUserId]));
     }
 
-    public function actionEdit($id) {
-        if(!$id) {
+    public function actionModify($id) {
+        $user = $this->database->table('users')->get($id);
+        if(!$id || !$user) {
             throw new InvalidArgumentException('Invalid Id');
         }
+        $newUserData = json_decode($this->getHttpRequest()->getRawBody());
+        $user->update([
+            'email' => $newUserData->email,
+            'password' => $newUserData->password,
+            'first_name' => $newUserData->first_name,
+            'second_name' => $newUserData->second_name,
+            'age' => $newUserData->age,
+            'sex' => $newUserData->sex,
+        ]);
+        $this->sendResponse(new JsonResponse(['msg' => 'ok']));
     }
 
     public function actionDelete($id) {
