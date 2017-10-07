@@ -12,16 +12,12 @@ use Nette\InvalidArgumentException;
 
 class RestRoute implements IRouter
 {
-    private static $methodsMap = [
-        'GET' => 'list',
-        'POST' => 'create',
-        'PUT' => 'modify',
-        'DELETE' => 'delete',
-    ];
     private $route;
+    private $method;
 
-    public function __construct($mask, $presenter) {
-        $this->route = new Route($mask, ['presenter' => $presenter]);
+    public function __construct($method, $mask, $metadata = []) {
+        $this->route = new Route($mask, $metadata);
+        $this->method = $method;
     }
 
     /**
@@ -33,13 +29,10 @@ class RestRoute implements IRouter
 
         $match = $this->route->match($httpRequest);
 
-        if(array_key_exists($match->getMethod(), self::$methodsMap)) {
-            $match->setParameters(array_merge($match->getParameters(), ['action' => self::$methodsMap[$match->getMethod()]]));
+        if($match && $match->getMethod() === $this->method) {
             return $match;
-        } else {
-            throw new InvalidArgumentException("Method '{$match->getMethod()}' is not allowed.");
         }
-
+        return null;
     }
 
     /**
