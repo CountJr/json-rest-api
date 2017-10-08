@@ -9,7 +9,6 @@ use Nette\Http\Url;
 use Nette\Application\Routers\Route;
 use Nette\InvalidArgumentException;
 
-
 class RestRoute implements IRouter
 {
     private static $methodsMap = [
@@ -20,7 +19,8 @@ class RestRoute implements IRouter
     ];
     private $route;
 
-    public function __construct($mask, $presenter) {
+    public function __construct($mask, $presenter)
+    {
         $this->route = new Route($mask, ['presenter' => $presenter]);
     }
 
@@ -29,17 +29,20 @@ class RestRoute implements IRouter
      * @param HttpRequest $httpRequest
      * @return AppRequest|NULL
      */
-    function match(HttpRequest $httpRequest) {
+    public function match(HttpRequest $httpRequest)
+    {
 
         $match = $this->route->match($httpRequest);
 
-        if(array_key_exists($match->getMethod(), self::$methodsMap)) {
-            $match->setParameters(array_merge($match->getParameters(), ['action' => self::$methodsMap[$match->getMethod()]]));
+        if (array_key_exists($match->getMethod(), self::$methodsMap)) {
+            $match->setParameters(array_merge(
+                $match->getParameters(),
+                ['action' => self::$methodsMap[$match->getMethod()]]
+            ));
             return $match;
         } else {
             throw new InvalidArgumentException("Method '{$match->getMethod()}' is not allowed.");
         }
-
     }
 
     /**
@@ -48,10 +51,9 @@ class RestRoute implements IRouter
      * @param Url $refUrl
      * @return string|NULL
      */
-    function constructUrl(AppRequest $appRequest, Url $refUrl) {
+    public function constructUrl(AppRequest $appRequest, Url $refUrl)
+    {
 
         return $this->route->constructUrl($appRequest, $refUrl);
-
     }
-
 }

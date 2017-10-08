@@ -6,19 +6,24 @@ use Nette;
 use Nette\Application\Responses\JsonResponse;
 use Nette\InvalidArgumentException;
 
-
 class UsersPresenter extends Nette\Application\UI\Presenter
 {
     private $database;
 
-    public function __construct(Nette\Database\Context $database) {
+    public function __construct(Nette\Database\Context $database)
+    {
         $this->database = $database;
     }
 
-    public function actionList($id) {
-        if(!$id) {
-            $users = array_map(function($user) { return $this->fetchRowToArray($user);},
-                iterator_to_array($this->database->table('users')));
+    public function actionList($id)
+    {
+        if (!$id) {
+            $users = array_map(
+                function ($user) {
+                    return $this->fetchRowToArray($user);
+                },
+                iterator_to_array($this->database->table('users'))
+            );
             $this->sendResponse(new JsonResponse($users));
         } else {
             $user = $this->fetchRowToArray($this->database->table('users')->get($id));
@@ -26,7 +31,8 @@ class UsersPresenter extends Nette\Application\UI\Presenter
         }
     }
 
-    public function actionCreate() {
+    public function actionCreate()
+    {
         $newUser = json_decode($this->getHttpRequest()->getRawBody());
         $newUserId = $this->database->table('users')->insert([
             'email' => $newUser->email,
@@ -39,9 +45,10 @@ class UsersPresenter extends Nette\Application\UI\Presenter
         $this->sendResponse(new JsonResponse(['id' => $newUserId]));
     }
 
-    public function actionModify($id) {
+    public function actionModify($id)
+    {
         $user = $this->database->table('users')->get($id);
-        if(!$id || !$user) {
+        if (!$id || !$user) {
             throw new InvalidArgumentException('Invalid Id');
         }
         $newUserData = json_decode($this->getHttpRequest()->getRawBody());
@@ -56,16 +63,18 @@ class UsersPresenter extends Nette\Application\UI\Presenter
         $this->sendResponse(new JsonResponse(['msg' => 'ok']));
     }
 
-    public function actionDelete($id) {
+    public function actionDelete($id)
+    {
         $user = $this->database->table('users')->get($id);
-        if(!$id || !$user) {
+        if (!$id || !$user) {
             throw new InvalidArgumentException('Invalid Id');
         }
         $user->delete();
         $this->sendResponse(new JsonResponse(['msg' => 'ok']));
     }
 
-    private function fetchRowToArray($row) {
+    private function fetchRowToArray($row)
+    {
         return [
             'id' => $row->id,
             'email' => $row->email,
