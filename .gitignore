@@ -2,5 +2,7 @@ app/config/config.local.neon
 vendor/
 log/
 temp/
+tmp/
 .idea/
 adminer.php
+.DS_Store

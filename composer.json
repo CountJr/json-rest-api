@@ -22,6 +22,20 @@
 		"tracy/tracy": "^2.3"
 	},
 	"require-dev": {
-		"nette/tester": "^1.6"
+		"codeclimate/php-test-reporter": "^0.3.2",
+		"squizlabs/php_codesniffer": "3.*",
+		"nette/tester": "^1.7",
+		"kdyby/tester-extras": "@dev"
+	},
+    "autoload": {
+        "classmap": ["app/"]
+    },
+    "autoload-dev": {
+        "classmap": ["tests/"]
+    },
+	"scripts": {
+		"test": "vendor/bin/tester",
+		"beauty": "vendor/bin/phpcbf --standard=PSR2 src bin tests",
+		"sniff": "vendor/bin/phpcs --standard=PSR2 src bin tests"
 	}
 }
